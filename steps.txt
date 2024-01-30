@@ -1,0 +1,126 @@
+first installed mysql and workbenc... there created db
+then the project folder created 2 folders backend & client
+then enter backend from terminal
+then "run npm init -y"
+then "npm i express mysql nodemon"
+
+
+//to fetch data from database
+
+import express from "express";
+import mysql from "mysql";
+
+const app = express()
+const db = mysql.createConnection({
+    host: "localhost",
+    user: "root",
+    password: "1234",
+    database: "test"
+})
+
+app.get("/", (req,res)=>{
+    res.json("this is backend")
+})
+
+app.get("/books", (req,res)=>{
+    const q = "select * from books"
+    db.query(q,(err,data)=>{
+        if(err) return res.json(err)
+        return res.json(data)
+    })
+})
+
+app.listen(8800,()=>{
+    console.log("connected 1")
+})
+
+
+---------------------------------------
+
+app.use(express.json()) // to insert data from client it will allow
+
+
+------------------------------------------------
+//create react app
+open new terminal
+cd client
+run "npx create-react-app ." // here . is for to create in current project, otherwise use a name you want
+npm start
+
+---------------------------------------------
+npm i axios // allows api req
+
+---------------------------
+//show data in console
+
+import React, { useEffect, useState } from 'react'
+import axios from "axios"
+const Books = () => {
+
+    const [books,setBooks] = useState([])
+
+    useEffect(()=>{
+        const feathAllBooks = async ()=>{
+            try{
+                const res = await axios.get("http://localhost:8800/books")
+                console.log(res)
+            }catch(err){
+                console.log(err)
+            }
+        }
+        feathAllBooks()
+    },[])
+  return (
+    <div>Books</div>
+  )
+}
+
+export default Books
+------------------------------
+//it need to remove errors
+run in in backend
+npm i cors
+
+app.use(cors()) //add this in backend index.js
+
+
+--------------------------------------
+
+//show data in page
+
+import React, { useEffect, useState } from "react";
+import axios from "axios";
+
+const Books = () => {
+  const [books, setBooks] = useState([]);
+
+  useEffect(() => {
+    const feathAllBooks = async () => {
+      try {
+        const res = await axios.get("http://localhost:8800/books");
+        //console.log(res)
+        setBooks(res.data);
+      } catch (err) {
+        console.log(err);
+      }
+    };
+    feathAllBooks();
+  }, []);
+  return (
+    <div>
+      <h1>Books</h1>
+      <div className="books">
+        {books.map(book=>(
+            <div className="book">
+                {book.cover && <img src={book.cover} alt=''/>}
+                <h2>{book.title}</h2>
+                <p><b>{book.author}</b></p>
+                <p>{book.desc}</p>
+            </div>
+        ))}
+      </div>
+    </div>
+  );
+};
+
+export default Books;
